@@ -1,76 +1,63 @@
+import jwt from "jsonwebtoken";
 import prisma from "../libs/prisma.js";
 import { response } from "../res/response.js";
 
-export const create = async (req, res, next) => {
+export const login = async (req, res, next) => {
     try {
-        const { nim, nama_lengkap, kelas, alamat } = req.body
-        if (!nim || !nama_lengkap || !kelas || !alamat ) {
-            return response(400, null, "Invalid input, harap isi kolom tidak boleh ada yang kosong", res)
-        }
-
-        const mahasiswa = await prisma.Mahasiswa.create({
-             data: { nim, nama_lengkap, kelas, alamat } 
+        const { username, password } = req.body
+        const data = await prisma.User.findFirst({
+            where: { username }
         })
-        response(201, mahasiswa, "Data berhasil ditambahkan", res)
 
-    } catch (error) {
-        next(error)
-    }
-}
+        if (!data) {
+           return response(401, { Authenticated: false }, "Username dan password tidak ditemukan", res)
+        } 
 
-export const getData = async (req, res, next) => {
-    try {
-        const mahasiswa = await prisma.Mahasiswa.findMany()
-        response(200, mahasiswa, "Data berhasil diambil", res)
-    } catch (error) {
-        next(error)
-    }
-}
-
-export const updateMahasiswa = async (req, res, next) => {
-    try {
-        const { nim, nama_lengkap, kelas, alamat } = req.body
-        if (!nim || !nama_lengkap || !kelas || !alamat) {
-            return response(400, null, "Harap isi input semua tidak boleh kosong", res)
+        if (password !== data.password) {
+            return response(401, { Authenticated: false }, "Password salah", res)
         }
+            // generate jwt token
+            try {
+                const token = jwt.sign({ userId: data.id }, process.env.JWT_SECRET, {
+                expiresIn: '1h',
+                })
+                
+            res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'Strict', maxAge: 3600000 })
+            response(200, { Authenticated: true }, "Success", res)
+            } catch (error) {
+                return response(500, null, "Fail", res)
+            }
 
-        const mahasiswa = await prisma.Mahasiswa.update({
-            where: { nim: nim },
-            data: { nama_lengkap, kelas, alamat }
-        })
-        response(201, mahasiswa, "Data berhasil di perbaharui", res)
-    } catch (error) {
-        next(error)
-    }
-}
-
-export const deleteMahasiswa = async (req, res, next) => {
-    try {
-        const { nim } = req.body
-        const mahasiswa = await prisma.Mahasiswa.delete({
-            where: { nim: nim }
-        })
-        response(200, mahasiswa, "Data berhasil di hapus", res)
-    } catch (error) {
-        next(error)
-    }
-}
-
-export const getMahasiswaByNim = async (req, res, next) => {
-    try {
-        const { nim } = req.params
-        const nimINT = parseInt(nim, 10)
-        if (!Number.isInteger(nimINT)) {
-            return response(400, null, "Tidak di temukan", res)
+        } catch (error) {
+            next(error)
         }
-        const mahasiswa = await prisma.Mahasiswa.findUnique({
-            where: { nim: nimINT }
-        })
-        if (!mahasiswa) {
-            response(404, null, "Mahasiswa dengan NIM tersebut tidak ditemukan", res)
-        }
-        response(200, mahasiswa, "Data berhasil diambil berdasarkan NIM", res)
-    } catch (error) {
-        next(error)
     }
-}   
+
+// export const updateMahasiswa = async (req, res, next) => {
+//     try {
+//         const { nim, nama_lengkap, kelas, alamat } = req.body
+//         if (!nim || !nama_lengkap || !kelas || !alamat) {
+//             return response(400, null, "Harap isi input semua tidak boleh kosong", res)
+//         }
+
+//         const mahasiswa = await prisma.Mahasiswa.update({
+//             where: { nim: nim },
+//             data: { nama_lengkap, kelas, alamat }
+//         })
+//         response(201, mahasiswa, "Data berhasil di perbaharui", res)
+//     } catch (error) {
+//         next(error)
+//     }
+// }
+
+// export const deleteMahasiswa = async (req, res, next) => {
+//     try {
+//         const { nim } = req.body
+//         const mahasiswa = await prisma.Mahasiswa.delete({
+//             where: { nim: nim }
+//         })
+//         response(200, mahasiswa, "Data berhasil di hapus", res)
+//     } catch (error) {
+//         next(error)
+//     }
+// }
