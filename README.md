@@ -26,10 +26,10 @@ Ikuti langkah-langkah ini untuk menginstal aplikasi:
    ```bash
    git clone https://github.com/fauzyDev/Backend-web-album.git
 
-2. # Instal dependensi
+2. **Instal dependensi**
     ```bash
     npm install
 
-3. # Jalankan Aplikasi
+3. **Jalankan Aplikasi**
     ```bash
     npm run dev
