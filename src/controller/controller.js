@@ -19,11 +19,12 @@ export const login = async (req, res, next) => {
             // generate jwt token
             try {
                 const token = jwt.sign({ userId: data.id }, process.env.JWT_SECRET, {
-                expiresIn: '1h',
+                algorithm: 'HS512',
+                expiresIn: '1h'
                 })
-                
-            res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'Strict', maxAge: 3600000 })
-            response(200, { Authenticated: true }, "Success", res)
+            // send token jwt to cookie    
+            res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict', maxAge: 3600000 })
+            response(200, { Authenticated: true }, "Successful", res)
             } catch (error) {
                 return response(500, null, "Fail", res)
             }

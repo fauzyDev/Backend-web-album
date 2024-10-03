@@ -1,3 +1,23 @@
-import csurf from "csurf";
+import { doubleCsrf } from "csrf-csrf";
 
-export const csrfProtection = csurf({ cookie: true })
+const csrfOptions = {
+    getSecret: () => process.env.CSRF_SECRET,
+    cookieName: "psifi.x-csrf-token",
+    cookieOptions: {
+        httpOnly: true, 
+        sameSite: "strict", 
+        secure: false,
+        path: "/"      
+    },
+    size: 64, //  hash token CSRF
+    ignoredMethods: ["GET", "HEAD", "OPTIONS"], 
+    getTokenFromRequest: (req) => req.headers["x-csrf-token"],
+    maxAge: 15 * 60
+}
+
+export const { 
+    invalidCsrfTokenError, 
+    generateToken, 
+    validateRequest, 
+    doubleCsrfProtection, 
+} = doubleCsrf(csrfOptions);

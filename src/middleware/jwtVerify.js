@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { response } from "../res/response.js";
 
+// verify token jwt
 export const authenticationToken = (req, res, next) => {
     const token = req.cookies.token;
 
