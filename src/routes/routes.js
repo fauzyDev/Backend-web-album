@@ -13,12 +13,13 @@ router.get('/api/v1/check-login', authenticationToken, (req, res) => {
 });
 
 router.post('/api/v1/logout', (req, res) => {
-    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict' })
+    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' })
+    res.clearCookie('psifi.x-csrf-token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' })
     return response(200, { Authenticated: false }, "Logged out successfully", res) // route logout
 });
 
 router.get('/api/v1/csrf', (req, res) => {
     const csrfToken = generateToken(req, res)
-    res.json({ csrfToken })
+    res.json({ csrfToken }) // route csrf token
 })
 

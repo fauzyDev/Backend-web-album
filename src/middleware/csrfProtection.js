@@ -18,6 +18,5 @@ const csrfOptions = {
 export const { 
     invalidCsrfTokenError, 
     generateToken, 
-    validateRequest, 
     doubleCsrfProtection, 
 } = doubleCsrf(csrfOptions);
