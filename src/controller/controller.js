@@ -6,7 +6,8 @@ export const login = async (req, res, next) => {
     try {
         const { username, password } = req.body
         const data = await prisma.User.findFirst({
-            where: { username }
+            where: { username },
+            cacheStrategy: { ttl: 60 },
         })
 
         if (!data) {
@@ -36,16 +37,7 @@ export const login = async (req, res, next) => {
 
 export const uploadFile = async (req, res, next) => {
     try {
-        const { nim, nama_lengkap, kelas, alamat } = req.body
-        if (!nim || !nama_lengkap || !kelas || !alamat) {
-            return response(400, null, "Harap isi input semua tidak boleh kosong", res)
-        }
-
-        const mahasiswa = await prisma.Mahasiswa.update({
-            where: { nim: nim },
-            data: { nama_lengkap, kelas, alamat }
-        })
-        response(201, mahasiswa, "Data berhasil di perbaharui", res)
+        
     } catch (error) {
         next(error)
     }
