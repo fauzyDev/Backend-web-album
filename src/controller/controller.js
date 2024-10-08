@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import prisma from "../libs/prisma.js";
+import { supabase } from "../config/supabase.js"
 import { response } from "../res/response.js";
 
 export const login = async (req, res, next) => {
@@ -35,22 +36,43 @@ export const login = async (req, res, next) => {
         }
     }
 
-export const uploadFile = async (req, res, next) => {
-    try {
-        
-    } catch (error) {
-        next(error)
-    }
-}
+export const fileUpload = async (req, res, next) => {
+        const file = req.file;
+    
+        if (!file) {
+          return response(400, null, "Harap upload foto atau video", res)
+        }
 
-// export const deleteMahasiswa = async (req, res, next) => {
-//     try {
-//         const { nim } = req.body
-//         const mahasiswa = await prisma.Mahasiswa.delete({
-//             where: { nim: nim }
-//         })
-//         response(200, mahasiswa, "Data berhasil di hapus", res)
-//     } catch (error) {
-//         next(error)
-//     }
-// }
+        const replaceFileName = (fileName) => {
+            return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file
+        }
+    
+        try {
+            const fileNameOriginal = file.originalname 
+            const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
+    
+            const { data, error } = await supabase.storage
+            .from('test')
+            .upload(fileName, file.buffer);
+    
+            if (error) {
+                console.error("Error Supabase:", error);
+                return response(500, false, "Gagal mengunggah file", res)
+            }
+    
+            const { data: dataUrl } = supabase.storage
+            .from('test')
+            .getPublicUrl(fileName);
+            
+            const publicUrl = dataUrl.publicUrl
+            await prisma.File.create({
+                 data: {
+                    url: publicUrl
+                 }
+            })
+    
+            response(201, true, "Sucessfull", res)
+        } catch (error) {
+            next(error)
+        }
+    }

@@ -1,7 +1,7 @@
 import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
-import cookieParser from "cookie-parser"
+import cookie from "cookie"
 import helmet from "helmet"
 import { errorHandler } from "./middleware/error.js"
 import { router } from "./routes/routes.js"
@@ -24,7 +24,10 @@ app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5000'],
     credentials: true })) // cors domain
 app.use(express.json());
 app.use(express.urlencoded({ extended:  true }));
-app.use(cookieParser()); // cookie parser
+app.use((req, res, next) => {
+  req.cookies = cookie.parse(req.headers.cookie || '');
+  next();
+});
 
 app.get('/', (req, res) => {
   res.status(200).json({

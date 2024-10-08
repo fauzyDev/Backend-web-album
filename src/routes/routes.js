@@ -1,7 +1,8 @@
 import express from "express"
 import { doubleCsrfProtection, generateToken } from "../middleware/csrfProtection.js"
 import { authenticationToken } from "../middleware/jwtVerify.js"
-import { login } from "../controller/controller.js"
+import { login, fileUpload } from "../controller/controller.js"
+import { upload } from "../controller/uploadFile.js"
 import { response } from "../res/response.js"
 
 export const router = express.Router()
@@ -23,3 +24,4 @@ router.get('/api/v1/csrf', (req, res) => {
     res.json({ csrfToken }) // route csrf token
 })
 
+router.post('/api/v1/upload', upload.single('file'), fileUpload) // route upload file
