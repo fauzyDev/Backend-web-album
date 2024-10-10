@@ -24,4 +24,4 @@ router.get('/api/v1/csrf', (req, res) => {
     res.json({ csrfToken }) // route csrf token
 })
 
-router.post('/api/v1/upload', upload.single('file'), fileUpload) // route upload file
+router.post('/api/v1/upload', upload.single('file'), doubleCsrfProtection ,fileUpload); // route upload file
