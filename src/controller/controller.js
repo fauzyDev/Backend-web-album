@@ -46,7 +46,7 @@ export const fileUpload = async (req, res, next) => {
     }
 
     const replaceFileName = (fileName) => {
-        return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file
+        return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file yang memiliki karakter unik
     }
     
     try {
