@@ -9,13 +9,15 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String
-  password String
+  id          Int      @id @default(autoincrement())
+  username    String
+  password    String
 }
 
 model File {
-  id        Int      @id @default(autoincrement())
-  url       String   @unique
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  url         String   @unique
+  judul       String?
+  description String?
+  createdAt   DateTime @default(now())
 }

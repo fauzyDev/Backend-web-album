@@ -18,12 +18,13 @@ export const login = async (req, res, next) => {
         if (password !== data.password) {
             return response(401, { Authenticated: false }, "Password salah", res)
         }
-            // generate jwt token
-            try {
-                const token = jwt.sign({ userId: data.id }, process.env.JWT_SECRET, {
+        // generate jwt token
+        try {
+            const token = jwt.sign({ userId: data.id }, process.env.JWT_SECRET, {
                 algorithm: 'HS512',
                 expiresIn: '1h'
-                })
+            })
+            
             // send token jwt to cookie    
             res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict', maxAge: 3600000 })
             response(200, { Authenticated: true }, "Successful", res)
@@ -37,39 +38,38 @@ export const login = async (req, res, next) => {
     }
 
 export const fileUpload = async (req, res, next) => {
-        const file = req.file;
+    const { judul, description } = req.body;
+    const file = req.file;
     
-        if (!file) {
-          return response(400, null, "Harap upload foto atau video", res)
-        }
+    if (!judul || !description || !file) {
+        return response(400, null, "Harap isi judul dan deskripsi serta upload foto atau video", res)
+    }
 
-        const replaceFileName = (fileName) => {
-            return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file
-        }
+    const replaceFileName = (fileName) => {
+        return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file
+    }
     
-        try {
-            const fileNameOriginal = file.originalname 
-            const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
+    try {
+        const fileNameOriginal = file.originalname 
+        const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
     
-            const { data, error } = await supabase.storage
+        const { data, error } = await supabase.storage
             .from('test')
             .upload(fileName, file.buffer);
     
-            if (error) {
-                console.error("Error Supabase:", error);
-                return response(500, false, "Gagal mengunggah file", res)
-            }
+        if (error) {
+            console.error("Error Supabase:", error);
+            return response(500, false, "Gagal mengunggah file", res)
+        }
     
-            const { data: dataUrl } = supabase.storage
+        const { data: dataUrl } = supabase.storage
             .from('test')
             .getPublicUrl(fileName);
             
-            const publicUrl = dataUrl.publicUrl
-            await prisma.File.create({
-                 data: {
-                    url: publicUrl
-                 }
-            })
+        const publicUrl = dataUrl.publicUrl
+        await prisma.File.create({
+            data: { judul, description, url: publicUrl }
+        })
     
             response(201, true, "Sucessfull", res)
         } catch (error) {
