@@ -38,26 +38,26 @@ export const login = async (req, res, next) => {
     }
 
 export const fileUpload = async (req, res, next) => {
-    const { judul, description } = req.body;
-    const file = req.file;
+        const { judul, description } = req.body;
+        const file = req.file;
     
-    if (!judul || !description || !file) {
-        return response(400, null, "Harap isi judul dan deskripsi serta upload foto atau video", res)
-    }
+        if (!judul || !description || !file) {
+            return response(400, null, "Harap isi judul dan deskripsi serta upload foto atau video", res)
+        }
 
-    const replaceFileName = (fileName) => {
-        return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file yang memiliki karakter unik
-    }
+        const replaceFileName = (fileName) => {
+            return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file yang memiliki karakter unik
+        }
     
-    try {
-        const fileNameOriginal = file.originalname 
-        const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
+        try {
+            const fileNameOriginal = file.originalname 
+            const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
     
-        const { data, error } = await supabase.storage
-            .from('test')
-            .upload(fileName, file.buffer);
+            const { data, error } = await supabase.storage
+                .from('test')
+                .upload(fileName, file.buffer);
     
-        if (error) {
+            if (error) {
             console.error("Error Supabase:", error);
             return response(500, false, "Gagal mengunggah file", res)
         }
@@ -72,6 +72,21 @@ export const fileUpload = async (req, res, next) => {
         })
     
             response(201, true, "Sucessfull", res)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+export const getData = async (req, res, next) => {
+    try {
+        const data = await prisma.File.findMany({
+            select: {
+                judul: true,
+                description: true,
+                url: true
+            }
+        })
+            response(200, data, "Data berhasil diambil", res)
         } catch (error) {
             next(error)
         }
