@@ -91,3 +91,30 @@ export const getData = async (req, res, next) => {
             next(error)
         }
     }
+
+export const deleteData = async (req, res, next) => {
+    try {
+        const { id } = req.body
+        const data = await prisma.File.delete({
+            select: {
+                id: true,
+                url: true
+            },
+            where: { id: id }
+        })
+        response(200, { data: true }, "Data berhasil di hapus", res)
+
+        const fileUrl = data.url
+        const fileName = fileUrl.split('/storage/v1/object/public/test/')[1].split('?')[0];
+        const { error } = await supabase
+        .storage
+        .from('test')
+        .remove([fileName])
+
+        if (error) {
+            return response(500, "Gagal menghapus data", res)
+        }
+    } catch (error) {
+        next(error)
+    }
+}

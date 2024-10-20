@@ -1,7 +1,7 @@
 import express from "express"
 import { doubleCsrfProtection, generateToken } from "../middleware/csrfProtection.js"
 import { authenticationToken } from "../middleware/jwtVerify.js"
-import { login, fileUpload, getData } from "../controller/controller.js"
+import { login, fileUpload, getData, deleteData } from "../controller/controller.js"
 import { upload } from "../controller/uploadFile.js"
 import { response } from "../res/response.js"
 
@@ -26,3 +26,4 @@ router.get('/api/v1/csrf', (req, res) => {
 
 router.post('/api/v1/upload', upload.single('file'), doubleCsrfProtection ,fileUpload); // route upload file
 router.get('/api/data', getData)
+router.delete('/api/data', deleteData)
