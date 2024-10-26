@@ -8,7 +8,7 @@ export const login = async (req, res, next) => {
         const { username, password } = req.body
         const data = await prisma.User.findFirst({
             where: { username },
-            cacheStrategy: { ttl: 60 },
+            cacheStrategy: { ttl: 20, swr: 40 },
         })
 
         if (!data) {
@@ -71,7 +71,7 @@ export const fileUpload = async (req, res, next) => {
                 description,
                 url: publicUrl
             },
-            cacheStrategy: { ttl: 60 },
+            cacheStrategy: { ttl: 20, swr: 40 },
         })
         response(201, { Success: true }, "Sucessful", res)
 
@@ -83,16 +83,16 @@ export const fileUpload = async (req, res, next) => {
 
 export const getData = async (req, res, next) => {
     try {
-        await prisma.File.findMany({
+        const data = await prisma.File.findMany({
             select: {
                 id: true,
                 judul: true,
                 description: true,
                 url: true
             },
-            cacheStrategy: { ttl: 60 },
+            cacheStrategy: { ttl: 20, swr: 40 },
         })
-        response(200, { Success: true }, "Data berhasil diambil", res)
+        response(200, data, "Data berhasil diambil", res)
 
         } catch (error) {
             console.error("Error", error)
@@ -126,4 +126,18 @@ export const deleteData = async (req, res, next) => {
         console.error("Error", error)
         next(error)
     }
+}
+
+export const updateData = async(req, res, next) => {
+    const { id } = req.body
+    const data = await prisma.File.update({
+        where: { id },
+        data: {
+            judul,
+            description,
+            url,
+        },
+        cacheStrategy: { ttl: 20, swr: 40 },
+    })
+    response(200, {  })
 }
