@@ -20,7 +20,7 @@ app.use(helmet({
       }
     }
 }))
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5000'],  
+app.use(cors({ origin: ['http://localhost:5173', 'https://api-web-album.vercel.app'],  
     credentials: true })) // cors domain
 app.use(express.json());
 app.use(express.urlencoded({ extended:  true }));
