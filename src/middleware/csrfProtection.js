@@ -6,7 +6,7 @@ const csrfOptions = {
     cookieOptions: {
         httpOnly: true, 
         sameSite: "strict", 
-        secure: false,
+        secure: true,
         path: "/"      
     },
     size: 64, //  hash token CSRF

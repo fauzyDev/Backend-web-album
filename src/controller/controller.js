@@ -26,7 +26,7 @@ export const login = async (req, res, next) => {
         })
             
         // send token jwt to cookie    
-        res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict', maxAge: 3600000 })
+        res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 3600000 })
         response(200, { Success: true }, "Successful", res)
             
         } catch (error) {
