@@ -11,21 +11,23 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.options('*', cors());
-app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        objectSrc: ["'none'"]
-      }
-    }
-}))
 app.use(cors({ origin: ['http://localhost:5173', 'https://api-web-album.vercel.app'],  
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'x-csrf-token']
   })) // cors domain
+app.options('*', cors());
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      objectSrc: ["'none'"]
+    }
+  }
+}))
+
 app.use(express.json());
 app.use(express.urlencoded({ extended:  true }));
 app.use((req, res, next) => {
