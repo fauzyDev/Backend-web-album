@@ -6,8 +6,7 @@ const csrfOptions = {
     cookieOptions: {
         httpOnly: true, 
         sameSite: "none", 
-        secure: false,
-        path: "/"      
+        secure: false,    
     },
     size: 64, //  hash token CSRF
     ignoredMethods: ["GET", "HEAD", "OPTIONS"], 
