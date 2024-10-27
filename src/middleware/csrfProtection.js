@@ -5,8 +5,8 @@ const csrfOptions = {
     cookieName: "psifi.x-csrf-token",
     cookieOptions: {
         httpOnly: true, 
-        sameSite: "lax", 
-        secure: true,
+        sameSite: "none", 
+        secure: false,
         path: "/"      
     },
     size: 64, //  hash token CSRF
