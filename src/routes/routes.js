@@ -1,5 +1,5 @@
 import express from "express"
-import { doubleCsrfProtection, generateToken } from "../middleware/csrfProtection.js"
+import { doubleCsrfProtection, generateToken, doubleCsrf } from "../middleware/csrfProtection.js"
 import { authenticationToken } from "../middleware/jwtVerify.js"
 import { login, fileUpload, getData, deleteData } from "../controller/controller.js"
 import { upload } from "../controller/uploadFile.js"
@@ -7,7 +7,7 @@ import { response } from "../res/response.js"
 
 export const router = express.Router()
 
-router.post('/api/v1/login', doubleCsrfProtection, login) // route login
+router.post('/api/v1/login', doubleCsrf, login) // route login
 router.get('/pages/v1/dashboard', authenticationToken) // route dashboard
 router.get('/api/v1/check-login', authenticationToken, (req, res) => {
     response(200, { Success: true }, "Successful", res) // route chech user login
