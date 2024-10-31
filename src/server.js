@@ -21,7 +21,7 @@ app.use(helmet({
   }
 }))
 
-app.use(cors({ origin: ['https://web-album-cyan.vercel.app'],  
+app.use(cors({ origin: ['http://localhost:5173'],  
     credentials: true, })) // cors domain
 
 app.use(express.json());

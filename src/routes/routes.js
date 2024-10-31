@@ -1,7 +1,7 @@
 import express from "express"
 import { doubleCsrfProtection, generateToken } from "../middleware/csrfProtection.js"
 import { authenticationToken } from "../middleware/jwtVerify.js"
-import { login, fileUpload, getData, deleteData } from "../controller/controller.js"
+import { login, fileUpload, getData, deleteData, updateData } from "../controller/controller.js"
 import { upload } from "../controller/uploadFile.js"
 import { response } from "../res/response.js"
 
@@ -23,6 +23,7 @@ router.post('/api/v1/logout', (req, res) => {
     return response(200, { Success: false }, "Logged out successfully", res) // route logout
 });
 
-router.post('/api/v1/upload', upload.single('file'), doubleCsrfProtection, fileUpload); // route upload file
 router.get('/api/data', getData)
+router.post('/api/v1/upload', upload.single('file'), doubleCsrfProtection, fileUpload); // route upload file
+router.patch('/api/data', upload.single('file'), updateData)
 router.delete('/api/data', deleteData)

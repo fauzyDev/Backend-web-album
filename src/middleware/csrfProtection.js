@@ -2,11 +2,11 @@ import { doubleCsrf } from "csrf-csrf";
 
 const csrfOptions = {
     getSecret: () => process.env.CSRF_SECRET,
-    cookieName: "__Host-psifi.x-csrf-token",
+    cookieName: "psifi.x-csrf-token",
     cookieOptions: {
         httpOnly: true, 
-        sameSite: "none", 
-        secure: true,
+        sameSite: "strict", 
+        secure: false,
         path: "/"      
     },
     size: 64, //  hash token CSRF

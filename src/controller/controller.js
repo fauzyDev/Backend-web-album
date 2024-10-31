@@ -26,7 +26,7 @@ export const login = async (req, res, next) => {
         })
             
         // send token jwt to cookie    
-        res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 3600000 })
+        res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict', maxAge: 3600000 })
         response(200, { Success: true }, "Successful", res)
             
         } catch (error) {
@@ -129,15 +129,49 @@ export const deleteData = async (req, res, next) => {
 }
 
 export const updateData = async(req, res, next) => {
-    const { id } = req.body
-    const data = await prisma.File.update({
-        where: { id },
-        data: {
-            judul,
-            description,
-            url,
-        },
-        cacheStrategy: { ttl: 20, swr: 40 },
-    })
-    response(200, {  })
+    const { judul, description } = req.body
+    const file   = req.file
+
+    const replaceFileName = (fileName) => {
+        return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file yang memiliki karakter unik
+    }
+
+    try {
+        const fileNameOriginal = file.originalname
+        const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
+
+        const { data, error  } = await supabase
+            .storage
+            .from('test')
+            .update(fileName, file.buffer, {
+            cacheControl: '3600',
+            upsert: true
+        })
+
+        if (error) {
+            console.error("Error Supabase:", error);
+            return response(500, { Success: false }, "Gagal mengunggah file", res)
+        }
+
+         const { data: dataUrl } = supabase.storage
+            .from('test')
+            .getPublicUrl(fileName);
+            
+        const publicUrl = dataUrl.publicUrl
+
+         await prisma.File.update({
+            where: { id },
+            data: {
+                judul,
+                description,
+                url: publicUrl
+            },
+            cacheStrategy: { ttl: 20, swr: 40 },
+        })
+        response(200, data, "Data berhail diupdate", res)
+    } catch (error) {
+        next(error)
+    }
+
+
 }
