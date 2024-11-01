@@ -129,49 +129,54 @@ export const deleteData = async (req, res, next) => {
 }
 
 export const updateData = async(req, res, next) => {
-    const { judul, description } = req.body
-    const file   = req.file
+    const { id, judul, description } = req.body
+    const file = req.file
 
     const replaceFileName = (fileName) => {
         return fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '') // replace nama file yang memiliki karakter unik
     }
 
     try {
-        const fileNameOriginal = file.originalname
-        const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
+        if (file) {
+            const fileNameOriginal = file.originalname
+            const get = await prisma.File.findUnique({ where: id })
+            const fileUrl = get.url.split('/').pop()
+            const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
 
-        const { data, error  } = await supabase
-            .storage
-            .from('test')
-            .update(fileName, file.buffer, {
-            cacheControl: '3600',
-            upsert: true
-        })
+            const { data, error  } = await supabase.storage
+                .from('test')
+                .update(fileUrl, file.buffer)
 
-        if (error) {
-            console.error("Error Supabase:", error);
-            return response(500, { Success: false }, "Gagal mengunggah file", res)
-        }
+            if (error) {
+                console.error("Error Supabase:", error);
+                return response(500, { Success: false }, "Gagal mengunggah file", res)
+            }
+            const { data: dataUrl } = supabase.storage
+               .from('test')
+               .getPublicUrl(fileUrl);
 
-         const { data: dataUrl } = supabase.storage
-            .from('test')
-            .getPublicUrl(fileName);
-            
-        const publicUrl = dataUrl.publicUrl
+            const publicUrl = dataUrl.publicUrl
 
-         await prisma.File.update({
-            where: { id },
-            data: {
-                judul,
-                description,
-                url: publicUrl
+        const update = {}
+        if (judul) update.judul = judul;
+        if (description) update.description = description;
+        if (description) update.url = publicUrl
+
+        const result = await prisma.File.update({
+            where: { id: parseInt(id) },
+            data: update,
+            select: {
+                id: true,
+                judul:  true,
+                description: true,
+                url: true
             },
             cacheStrategy: { ttl: 20, swr: 40 },
         })
-        response(200, data, "Data berhail diupdate", res)
+            response(200, result, "Data berhail diupdate", res)
+        }
     } catch (error) {
         next(error)
     }
-
 
 }
