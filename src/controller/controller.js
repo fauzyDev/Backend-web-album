@@ -137,15 +137,18 @@ export const updateData = async(req, res, next) => {
     }
 
     try {
+        let publicUrl
         if (file) {
             const fileNameOriginal = file.originalname
-            const get = await prisma.File.findUnique({ where: id })
-            const fileUrl = get.url.split('/').pop()
-            const fileName = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
+            const existingData = await prisma.File.findUnique({ where: { id: parseInt(id) } })
+            const existingFileName = existingData.url.split('/').pop()
+            const sanitizedFileName  = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
 
             const { data, error  } = await supabase.storage
                 .from('test')
-                .update(fileUrl, file.buffer)
+                .update(existingFileName, file.buffer, {
+                    cacheControl: 0
+                })
 
             if (error) {
                 console.error("Error Supabase:", error);
@@ -153,14 +156,14 @@ export const updateData = async(req, res, next) => {
             }
             const { data: dataUrl } = supabase.storage
                .from('test')
-               .getPublicUrl(fileUrl);
+               .getPublicUrl(existingFileName);
 
-            const publicUrl = dataUrl.publicUrl
+            publicUrl = dataUrl.publicUrl
 
         const update = {}
         if (judul) update.judul = judul;
         if (description) update.description = description;
-        if (description) update.url = publicUrl
+        if (publicUrl) update.url = publicUrl
 
         const result = await prisma.File.update({
             where: { id: parseInt(id) },
@@ -178,5 +181,4 @@ export const updateData = async(req, res, next) => {
     } catch (error) {
         next(error)
     }
-
 }
