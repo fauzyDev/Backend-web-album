@@ -1,5 +1,6 @@
 import { doubleCsrf } from "csrf-csrf";
 
+// configuration token csrf
 const csrfOptions = {
     getSecret: () => process.env.CSRF_SECRET,
     cookieName: "psifi.x-csrf-token",

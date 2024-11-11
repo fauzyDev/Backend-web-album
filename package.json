@@ -10,8 +10,8 @@
     "dev": "nodemon src/server.js",
     "postinstall": "prisma generate --no-engine"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["API Album foto dan video"],
+  "author": "Fauzy",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.20.0",

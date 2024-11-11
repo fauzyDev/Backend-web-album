@@ -137,16 +137,27 @@ export const updateData = async(req, res, next) => {
     }
 
     try {
-        let publicUrl
+
+        const update = { judul, description }
+
         if (file) {
             const fileNameOriginal = file.originalname
             const existingData = await prisma.File.findUnique({ where: { id: parseInt(id) } })
             const existingFileName = existingData.url.split('/').pop()
             const sanitizedFileName  = `${Date.now()}-${replaceFileName(fileNameOriginal)}`
 
+            const { error: deleteError } = await supabase.storage
+                .from('test')
+                .remove([existingFileName]);
+
+            if (deleteError) {
+                console.error("Error menghapus file lama:", deleteError);
+            return response(500, { Success: false }, "Gagal menghapus file", res);
+            }
+
             const { data, error  } = await supabase.storage
                 .from('test')
-                .update(existingFileName, file.buffer, {
+                .upload(sanitizedFileName, file.buffer, {
                     cacheControl: 0
                 })
 
@@ -156,14 +167,10 @@ export const updateData = async(req, res, next) => {
             }
             const { data: dataUrl } = supabase.storage
                .from('test')
-               .getPublicUrl(existingFileName);
+               .getPublicUrl(sanitizedFileName);
 
-            publicUrl = dataUrl.publicUrl
-
-        const update = {}
-        if (judul) update.judul = judul;
-        if (description) update.description = description;
-        if (publicUrl) update.url = publicUrl
+            update.url = dataUrl.publicUrl
+        }
 
         const result = await prisma.File.update({
             where: { id: parseInt(id) },
@@ -177,7 +184,7 @@ export const updateData = async(req, res, next) => {
             cacheStrategy: { ttl: 20, swr: 40 },
         })
             response(200, result, "Data berhail diupdate", res)
-        }
+        
     } catch (error) {
         next(error)
     }
