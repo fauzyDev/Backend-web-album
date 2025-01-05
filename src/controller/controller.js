@@ -128,8 +128,8 @@ export const deleteData = async (req, res, next) => {
     }
 }
 
-export const updateData = async(req, res, next) => {
-    const { id, judul, description } = req.body
+export const updateData = async (req, res, next) => {
+    const { id, judul, description, url } = req.body
     const file = req.file
 
     const replaceFileName = (fileName) => {
@@ -137,8 +137,10 @@ export const updateData = async(req, res, next) => {
     }
 
     try {
-
-        const update = { judul, description }
+        const update = {};
+        if (judul) update.judul = judul;
+        if (description) update.description = description;
+        if (url) update.url = url;
 
         if (file) {
             const fileNameOriginal = file.originalname

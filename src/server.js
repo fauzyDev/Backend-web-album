@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended:  true }));
 app.use(cookieParser())
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   res.status(200).json({
     status: 200,
     message: "API V1 Ready"

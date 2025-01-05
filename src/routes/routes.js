@@ -8,7 +8,7 @@ import { response } from "../res/response.js"
 export const router = express.Router()
 
 // route get csrf token
-router.get('/api/v1/csrf', (req, res) => {
+router.get('/api/v1/csrf', async (req, res) => {
     const csrfToken = generateToken(req, res)
     res.json({ csrfToken }) // route csrf token
 })
@@ -18,12 +18,12 @@ router.post('/api/v1/login', doubleCsrfProtection, login);
 // route get dashboard
 router.get('/pages/v1/dashboard', authenticationToken);
 // route get check admin login
-router.get('/api/v1/check-login', authenticationToken, (req, res) => {
+router.get('/api/v1/check-login', authenticationToken, async (req, res) => {
     response(200, { Success: true }, "Successful", res)
 });
 
 // route post logout
-router.post('/api/v1/logout', (req, res) => {
+router.post('/api/v1/logout', async (req, res) => {
     res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
     res.clearCookie('psifi.x-csrf-token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
     return response(200, { Success: false }, "Logged out successfully", res);

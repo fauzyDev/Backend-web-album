@@ -1,7 +1,7 @@
 {
   "name": "backend-web-album",
   "version": "1.0.0",
-  "description": "",
+  "description": "CRUD backend web album",
   "main": "index.js",
   "type": "module",
   "scripts": {
