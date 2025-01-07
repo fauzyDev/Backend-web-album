@@ -191,3 +191,28 @@ export const updateData = async (req, res, next) => {
         next(error)
     }
 }
+
+export const filterFile = async (req, res, next) => {
+    try {
+        const file = await prisma.file.findMany({
+            where: {
+              OR: [
+                { url: { endsWith: '.jpg' } },
+                { url: { endsWith: '.png' } },
+                { url: { endsWith: '.jpeg' } },
+              ],
+            },
+            select: {
+              id: true,
+              judul: true,
+              description: true,
+              url: true,
+            },
+          });
+          response(200, file, "succes", res)
+    } catch (error) {
+        next(error)
+    }
+  };
+
+  
