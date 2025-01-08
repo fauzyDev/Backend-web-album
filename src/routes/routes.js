@@ -1,7 +1,7 @@
 import express from "express"
 import { doubleCsrfProtection, generateToken } from "../middleware/csrfProtection.js"
 import { authenticationToken } from "../middleware/jwtVerify.js"
-import { login, fileUpload, getData, deleteData, updateData, filterFile } from "../controller/controller.js"
+import { login, fileUpload, getData, deleteData, updateData, filterImage, filterVideo } from "../controller/controller.js"
 import { upload } from "../controller/uploadFile.js"
 import { response } from "../res/response.js"
 
@@ -37,5 +37,7 @@ router.post('/api/v1/upload', upload.single('file'), doubleCsrfProtection, fileU
 router.patch('/api/data', upload.single('file'), doubleCsrfProtection, updateData);
 // route delete file
 router.delete('/api/data', doubleCsrfProtection, deleteData);
-// route filter file
-router.get('/api/filter', filterFile)
+// route filter image
+router.get('/api/filter/image', filterImage);
+// route filter video
+router.get('/api/filter/video', filterVideo);
